@@ -3,10 +3,16 @@ from tkinter import *
 from metodos_staticos import *
 from dato import IntegrityError
 from _tkinter import TclError
+def mensaje_alta(fun_alta):
+    def envoltura(*args):
+        fun_alta(*args)
+        print("hola")
+    return envoltura
 
 class Control():
     def __init__(self) -> None:
         pass
+    @mensaje_alta
     def alta(producto,precio,tree,stock,my_base):   
         try:
             if producto.get()!="" and precio.get()!="" and stock.get()!="":
