@@ -5,8 +5,10 @@ from dato import IntegrityError
 from _tkinter import TclError
 def mensaje_alta(fun_alta):
     def envoltura(*args):
-        fun_alta(*args)
-        print("hola")
+        if fun_alta(*args):
+            print("hola")
+        else:
+            print("chau")
     return envoltura
 
 class Control():
@@ -14,6 +16,7 @@ class Control():
         pass
     @mensaje_alta
     def alta(producto,precio,tree,stock,my_base):   
+        valor=True
         try:
             if producto.get()!="" and precio.get()!="" and stock.get()!="":
                 if validar.validar_producto(producto.get())==True:
@@ -36,18 +39,21 @@ class Control():
                         Control.actualizar_treeview(tree,my_base)
                         Vaciar.vaciar(producto,precio,stock)
                     else:
-                        showinfo(title="ALTA",message="Alta Cancelada")   
+                        showinfo(title="ALTA",message="Alta Cancelada")  
+                        valor=False
                 else:
                     showerror(title="ERROR AL VALIDAR", message="ERROR EN EL CAMPO DESCIPCION")
+                    valor=False
             else:
                 showerror(title="ERROR", message="NO SE PUEDEN DAR DE ALTA CAMPOS VACIOS")
+                valor=False
         except(IntegrityError):
             showerror(title="ERROR", message="NO SE PUEDEN DAR DE ALTA PRODUCTOS IGUALES")
             Vaciar.vaciar(producto,precio,stock)
         except(TclError):
             showerror(title="ERROR", message="CAMPO PRECIO U STOCK VACIOS, NO ADMITEN LETRAS")
             Vaciar.vaciar(producto,precio,stock)
-
+        return valor
     def baja(tree,producto,precio,stock,boton_modificar,boton_alta,boton_borrar,my_base):
         
         if askyesno("BAJA",f"decea dar de baja: {producto.get()} $ {precio.get()}"):
