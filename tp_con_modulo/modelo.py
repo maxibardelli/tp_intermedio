@@ -1,8 +1,9 @@
 from tkinter.messagebox import askyesno,showerror,showinfo
 from tkinter import *
 from metodos_staticos import *
-from dato import IntegrityError
+#from dato import IntegrityError
 from _tkinter import TclError
+import sqlite3 as sq
 def mensaje_alta(fun_alta):
     def envoltura(*args):
         if fun_alta(*args):
@@ -47,7 +48,7 @@ class Control():
             else:
                 showerror(title="ERROR", message="NO SE PUEDEN DAR DE ALTA CAMPOS VACIOS")
                 valor=False
-        except(IntegrityError):
+        except(sq.IntegrityError):
             showerror(title="ERROR", message="NO SE PUEDEN DAR DE ALTA PRODUCTOS IGUALES")
             Vaciar.vaciar(producto,precio,stock)
         except(TclError):
