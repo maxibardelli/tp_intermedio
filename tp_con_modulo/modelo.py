@@ -3,15 +3,29 @@ from tkinter import *
 from metodos_staticos import *
 #from dato import IntegrityError
 from _tkinter import TclError
-import sqlite3 as sq
+#import sqlite3 as sq
+from sqlite3  import IntegrityError 
 def mensaje_alta(fun_alta):
     def envoltura(*args):
         if fun_alta(*args):
-            print("hola")
+            print("Alta hecha")
         else:
-            print("chau")
+            print("Alta cancelada")
     return envoltura
-
+def mensaje_baja(fun_baja):
+    def envoltura(*args):
+        if fun_baja(*args):
+            print("Baja")
+        else:
+            print("Baja cancelada")
+    return envoltura
+def mensaje_modificar(fun_modificar):
+    def envoltura(*args):
+        if fun_modificar(*args):
+            print("Modificacion hecha")
+        else:
+            print("Modificacion cancelada")
+    return envoltura
 class Control():
     def __init__(self) -> None:
         pass
@@ -48,13 +62,16 @@ class Control():
             else:
                 showerror(title="ERROR", message="NO SE PUEDEN DAR DE ALTA CAMPOS VACIOS")
                 valor=False
-        except(sq.IntegrityError):
+        except(IntegrityError):
             showerror(title="ERROR", message="NO SE PUEDEN DAR DE ALTA PRODUCTOS IGUALES")
             Vaciar.vaciar(producto,precio,stock)
+            valor=False
         except(TclError):
             showerror(title="ERROR", message="CAMPO PRECIO U STOCK VACIOS, NO ADMITEN LETRAS")
             Vaciar.vaciar(producto,precio,stock)
+            valor=False
         return valor
+    @mensaje_baja
     def baja(tree,producto,precio,stock,boton_modificar,boton_alta,boton_borrar,my_base):
         
         if askyesno("BAJA",f"decea dar de baja: {producto.get()} $ {precio.get()}"):
@@ -73,19 +90,22 @@ class Control():
             Control.actualizar_treeview(tree,my_base)
             showinfo(title="BAJA",message="Baja Exitosa") 
             Vaciar.vaciar(producto,precio,stock)
+            valor=True
         else:
             showerror(title="ERROR",message="BAJA CANCELADA")
             Vaciar.vaciar(producto,precio,stock)
+            valor=False
         boton_modificar.configure(state=DISABLED)
         boton_alta.configure(state=NORMAL)
         boton_borrar.configure(state=DISABLED) 
-
+        return valor
+    @mensaje_modificar
     def modificar(tree,producto,precio,stock,boton_modificar,boton_alta,boton_borrar,my_base):
+        valor=True
         try:
             if producto.get()!="" and precio.get()!="" and stock.get()!="":
                 if validar.validar_producto(producto.get())==True:
                     if askyesno("MODIFICAR",f"decea modificar: {producto.get()} ${precio.get()} {stock.get()}"):
-                        
                         select=tree.selection()
                         select_item=tree.item(select)
                         id_item=select_item["text"]
@@ -98,25 +118,35 @@ class Control():
                         Control.actualizar_treeview(tree,my_base)                        
                         showinfo(title="MODIFICAR",message="Modificacion Exitosa")
                         Vaciar.vaciar(producto,precio,stock)
+                        valor=True
                     else:
                         showinfo(title="MODIFICAR",message="Modificacion Cancelada")
                         Vaciar.vaciar(producto,precio,stock)
+                        valor=False
                 else:
                     showerror(title="ERROR AL VALIDAR", message="ERROR EN EL CAMPO DESCIPCION")
                     Vaciar.vaciar(producto,precio,stock)
+                    valor=False
             else:
                 showerror(title="ERROR", message="CAMPO DESCRIPCION VACIO")        
                 boton_modificar.configure(state=DISABLED)
                 boton_alta.configure(state=NORMAL)
                 boton_borrar.configure(state=DISABLED)
                 Vaciar.vaciar(producto,precio,stock)
+                valor=False
         except(TclError):
             showerror(title="ERROR", message="CAMPO PRECIO U STOCK VACIOS, NO ADMITEN LETRAS")
             Vaciar.vaciar(producto,precio,stock)
-
+            valor=False
+        except(IntegrityError):
+            showerror(title="ERROR", message="CAMPO PRECIO U STOCK VACIOS, NO ADMITEN LETRAS")
+            Vaciar.vaciar(producto,precio,stock)
+            valor=False
         boton_modificar.configure(state=DISABLED)
         boton_alta.configure(state=NORMAL)
         boton_borrar.configure(state=DISABLED)
+        
+        return valor
             
 
 
